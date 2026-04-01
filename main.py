@@ -123,19 +123,51 @@ def saisie_coordonnees(grille: list[list]) -> tuple:
             print("La position n'est pas dans la grille.")
 
 
-def deplacer_pion(tour_de_jeu: str, grille: list[list], coordonnees: tuple):
+def deplacer_pion(tour_de_jeu: str, grille: list[list]) -> list[list]:
 
     lettre_couleur = tour_de_jeu[0]
-    ligne_base, colonne_base = coordonnees
 
-    if lettre_couleur != grille[ligne_base][colonne_base]:
-        return "Ce pion ne vous appartient pas."
+    print("Quel pion souhaitez-vous déplacer ?")
+    pion_joueur_actif, ligne_base, colonne_base = demander_saisie_pion_a_deplacer(
+        grille
+    )
+
+    while lettre_couleur != pion_joueur_actif:
+        print("Ce pion ne vous appartient pas.")
+        pion_joueur_actif, ligne_base, colonne_base = demander_saisie_pion_a_deplacer(
+            grille
+        )
 
     print("Où souhaitez-vous le déplacer ?")
-    ligne_finale, colonne_finale = saisie_coordonnees(grille)
 
-    if not est_diagonale(ligne_base, colonne_base, ligne_finale, colonne_finale):
-        return "Le déplacement est incorrect, vous ne pouvez vous déplacer que de manière diagonale."
+    while True:
+        case_position_finale, ligne_finale, colonne_finale = (
+            demander_saisie_pion_a_deplacer(grille)
+        )
+
+        if not est_diagonale(ligne_base, colonne_base, ligne_finale, colonne_finale):
+            print(
+                "Le déplacement est incorrect, vous ne pouvez vous déplacer que de manière diagonale."
+            )
+            continue
+
+        if lettre_couleur == case_position_finale:
+            print(
+                "Vous ne pouvez pas vous déplacer ici, un pion de votre équipe vous bloque."
+            )
+            continue
+
+        break
+
+    match case_position_finale:
+        case " ":
+            grille[ligne_finale][colonne_finale] = pion_joueur_actif
+            grille[ligne_base][colonne_base] = " "
+
+        case _:
+            pass
+
+    return grille
 
 
 def est_diagonale(
@@ -150,6 +182,17 @@ def est_diagonale(
     if diff_lignes == 1 and diff_colonnes == 1:
         return True
     return False
+
+
+def demander_saisie_pion_a_deplacer(
+    grille: list[list],
+) -> tuple[list[list[str]], int, int]:
+
+    coordonnees = saisie_coordonnees(grille)
+    ligne, colonne = coordonnees
+    pion_joueur_actif = grille[ligne][colonne]
+
+    return pion_joueur_actif, ligne, colonne
 
 
 def afficher_grille(
@@ -181,7 +224,12 @@ def afficher_grille(
     print(
         f"Les noirs ont capturés {nb_pions_captures_noir} pièces.\nLes blancs ont capturés {nb_pions_captures_blancs} pièces.\n "
     )
-    print(f"C'est au tour des {tour_de_jeu} de jouer.")
+    print(f"C'est au tour des {tour_de_jeu} de jouer.\n")
+
+
+def jeu(grille: list[list], tour_de_jeu: str):
+    # Fonction qui va gérer le déroulement du jeu.
+    pass
 
 
 def main():
@@ -191,13 +239,15 @@ def main():
     test()
 
     tour_de_jeu = "blancs"
+    # jeu(grille, tour_de_jeu)
 
     grille = creer_grille()
 
     afficher_grille(grille, tour_de_jeu, 0, 0)
-    coord = saisie_coordonnees(grille)
 
-    deplacer_pion(tour_de_jeu, grille, coord)
+    nouvelle_grille = deplacer_pion(tour_de_jeu, grille)
+    tour_de_jeu = "noir"
+    afficher_grille(nouvelle_grille, tour_de_jeu, 0, 0)
 
 
 def test():  # Fonction de test principale, appelle chacune des petites fonctions de test et effectue un test global
