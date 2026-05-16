@@ -311,8 +311,10 @@ def demander_mode_de_jeu() -> str:
 
 
 def demander_grille() -> list[list]:
-    grille_input = input(
-        "Veuillez choisir la grille en fonction de l'avancée du jeu : \n1 - type début de partie\n2 - type milieu de partie\n3 - fin de partie\n"
+    grille_input = int(
+        input(
+            "Veuillez choisir la grille en fonction de l'avancée du jeu : \n1 - type début de partie\n2 - type milieu de partie\n3 - fin de partie\n"
+        )
     )
 
     while grille_input not in [1, 2, 3]:
@@ -368,12 +370,6 @@ def jeu(tour_de_jeu: str):
 
     grille = demander_grille()
     type_jeu = demander_mode_de_jeu()
-
-    afficher_grille(
-        grille, tour_de_jeu, nb_pions_captures_par_noirs, nb_pions_captures_par_blancs
-    )
-
-    grille = []
 
     while True:
         afficher_grille(
@@ -490,6 +486,7 @@ def test():  # Fonction de test principale, appelle chacune des petites fonction
     # Appel des sous-fonctions de test
     test_est_au_bon_format()
     test_est_dans_grille()
+    test_est_diagonale()
     test_est_meme_couleur()
     test_analyser_distance_diagonale()
     test_obtenir_coordonnees_milieu()
