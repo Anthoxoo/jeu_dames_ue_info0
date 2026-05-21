@@ -557,7 +557,6 @@ def afficher_grille(
     nb_pions_captures_noirs: int,
     nb_pions_captures_blancs: int,
 ):
-
     # print(f"...") permet de mettre une variable dans un print et d'éviter de faire print("..." + variable + "...")
 
     lettres = ["H", "G", "F", "E", "D", "C", "B", "A"]
@@ -659,7 +658,6 @@ def main():
 def test():  # Fonction de test principale, appelle chacune des petites fonctions de test et effectue un test global
 
     def test_est_au_bon_format():
-
         assert est_au_bon_format("A8")
         assert not est_au_bon_format("AA")
         assert not est_au_bon_format("55")
@@ -668,7 +666,6 @@ def test():  # Fonction de test principale, appelle chacune des petites fonction
         assert est_au_bon_format("Z9")
 
     def test_est_dans_grille():
-
         grille = creer_grille_debut_partie()
         assert est_dans_grille("A", 3, grille)
         assert not est_dans_grille("M", 2, grille)
@@ -678,41 +675,34 @@ def test():  # Fonction de test principale, appelle chacune des petites fonction
 
     def test_est_diagonale():
 
-        assert est_diagonale(3, 3, 4, 4)  # Diagonale Bas-Droite
-        assert est_diagonale(3, 3, 2, 2)  # Diagonale Haut-Gauche
-        assert est_diagonale(3, 3, 4, 2)  # Diagonale Bas-Gauche
-        assert est_diagonale(3, 3, 2, 4)  # Diagonale Haut-Droite
-        assert not est_diagonale(3, 3, 3, 3)  # Aucun mouvement (reste sur la même case)
-        assert not est_diagonale(3, 3, 5, 5)  # Diagonale de 2 cases
-        assert not est_diagonale(1, 1, 8, 8)  # Diagonale de bout en bout du plateau
-        assert not est_diagonale(3, 3, 5, 4)  # +2 lignes, +1 colonne
-        assert not est_diagonale(3, 3, 2, 5)  # -1 ligne, +2 colonnes
+        assert est_diagonale(3, 3, 4, 4)
+        assert est_diagonale(3, 3, 2, 2)
+        assert est_diagonale(3, 3, 4, 2)
+        assert est_diagonale(3, 3, 2, 4)
+        assert not est_diagonale(3, 3, 3, 3)
+        assert not est_diagonale(3, 3, 5, 5)
+        assert not est_diagonale(1, 1, 8, 8)
+        assert not est_diagonale(3, 3, 5, 4)
+        assert not est_diagonale(3, 3, 2, 5)
 
     def test_est_meme_couleur():
-        # Cas vrais
         assert est_meme_couleur("n", "n")
         assert est_meme_couleur("b", "b")
-        # Cas faux
         assert not est_meme_couleur("n", "b")
         assert not est_meme_couleur("b", " ")
         assert not est_meme_couleur("n", " ")
 
     def test_analyser_distance_diagonale():
-        # Déplacements de 1 case (Doit renvoyer 1)
         assert analyser_distance_diagonale(2, 2, 3, 3) == 1
         assert analyser_distance_diagonale(4, 4, 3, 5) == 1
 
-        # Déplacements de 2 cases (Doit renvoyer 2)
         assert analyser_distance_diagonale(2, 2, 4, 4) == 2
         assert analyser_distance_diagonale(4, 4, 2, 2) == 2
 
-        # Déplacements illégaux (Doit renvoyer 0)
-        assert analyser_distance_diagonale(2, 2, 2, 2) == 0  # Sur place
-        assert analyser_distance_diagonale(2, 2, 5, 5) == 0  # Diagonale de 3 cases
-        assert (
-            analyser_distance_diagonale(2, 2, 2, 3) == 0
-        )  # Ligne droite (horizontale)
-        assert analyser_distance_diagonale(2, 2, 4, 3) == 0  # Mouvement de cavalier
+        assert analyser_distance_diagonale(2, 2, 2, 2) == 0
+        assert analyser_distance_diagonale(2, 2, 5, 5) == 0
+        assert analyser_distance_diagonale(2, 2, 2, 3) == 0
+        assert analyser_distance_diagonale(2, 2, 4, 3) == 0
 
     def test_obtenir_coordonnees_milieu():
         assert obtenir_coordonnees_milieu(2, 2, 4, 4) == (3, 3)
@@ -748,6 +738,35 @@ def test():  # Fonction de test principale, appelle chacune des petites fonction
         assert peut_capturer(3, 2, "n", grille_test)
         assert not peut_capturer(0, 0, "b", grille_test)
 
+    def test_lister_captures_pion():
+        grille = creer_grille_fin_partie()
+        grille[4][4] = "b"
+        grille[3][3] = "n"
+        grille[2][2] = " "
+        assert (2, 2) in lister_captures_pion(4, 4, "b", grille)
+        assert len(lister_captures_pion(0, 0, "b", grille)) == 0
+
+    def test_directions_simple_par_couleur():
+        assert directions_simple_par_couleur("blancs") == [(-1, -1), (-1, 1)]
+        assert directions_simple_par_couleur("noirs") == [(1, -1), (1, 1)]
+
+    def test_remplacer_case_capturee():
+        grille = creer_grille_fin_partie()
+        grille[4][4] = "b"
+        remplacer_case_capturee(grille, "b", 4, 4, 3, 3)
+        assert grille[4][4] == " "
+        assert grille[3][3] == "b"
+
+    def test_coups_possible_pour_pion_donne():
+        grille = creer_grille_fin_partie()
+        grille[4][4] = "b"
+        assert len(coups_possible_pour_pion_donne(grille, 4, 4, "blancs")) == 2
+
+    def test_coups_possibles():
+        grille = creer_grille_fin_partie()
+        grille[4][4] = "b"
+        assert len(coups_possibles(grille, "blancs")) == 2
+
     # Appel des sous-fonctions de test
     test_est_au_bon_format()
     test_est_dans_grille()
@@ -757,6 +776,11 @@ def test():  # Fonction de test principale, appelle chacune des petites fonction
     test_obtenir_coordonnees_milieu()
     test_est_mouvement_vers_avant()
     test_peut_capturer()
+    test_lister_captures_pion()
+    test_directions_simple_par_couleur()
+    test_remplacer_case_capturee()
+    test_coups_possible_pour_pion_donne()
+    test_coups_possibles()
 
     print(" TESTS OK")
 
