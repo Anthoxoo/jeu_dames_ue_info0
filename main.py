@@ -321,6 +321,18 @@ def deplacer_pion(
                 return nb_pion_mange
 
 
+def directions_simple_par_couleur(tour_de_jeu: str) -> list[tuple]:
+    LETTRE_COULEUR = tour_de_jeu[0]
+
+    directions_simples = []
+    if LETTRE_COULEUR == "b":
+        directions_simples = [(-1, -1), (-1, 1)]
+    elif LETTRE_COULEUR == "n":
+        directions_simples = [(1, -1), (1, 1)]
+
+    return directions_simples
+
+
 def deplacer_pion_ia_naive(grille: list[list], tour_de_jeu: str) -> int:
     LETTRE_COULEUR = tour_de_jeu[0]
     nb_pion_mange = 0
@@ -396,11 +408,7 @@ def coups_possible_pour_pion_donne(
         ligne_pion, colonne_pion, LETTRE_COULEUR, grille
     )
 
-    directions_simples = []
-    if LETTRE_COULEUR == "b":
-        directions_simples = [(-1, -1), (-1, 1)]
-    elif LETTRE_COULEUR == "n":
-        directions_simples = [(1, -1), (1, 1)]
+    directions_simples = directions_simple_par_couleur(tour_de_jeu)
 
     for diff_i, diff_j in directions_simples:
         ligne_finale = ligne_pion + diff_i
@@ -427,11 +435,7 @@ def coups_possibles(grille: list[list[str]], tour_de_jeu: str) -> list[tuple]:
                 for destination in destinations_capture:
                     coups_captures.append(((i, j), destination))
 
-                directions_simples = []
-                if LETTRE_COULEUR == "b":
-                    directions_simples = [(-1, -1), (-1, 1)]
-                elif LETTRE_COULEUR == "n":
-                    directions_simples = [(1, -1), (1, 1)]
+                directions_simples = directions_simple_par_couleur(tour_de_jeu)
 
                 for diff_i, diff_j in directions_simples:
                     ligne_finale = i + diff_i
