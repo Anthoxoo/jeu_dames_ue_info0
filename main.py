@@ -15,6 +15,7 @@ LETTRE_VALEUR = {
 }
 
 
+#### CREATION DU PLATEAU ####
 def creer_grille_debut_partie() -> list[list]:
     return [
         [" ", "n", " ", "n", " ", "n", " ", "n"],
@@ -54,6 +55,12 @@ def creer_grille_fin_partie() -> list[list]:
     ]
 
 
+#### FONCTIONS INTERMEDIAIRES ####
+
+
+## FONCTIONS DE VERIFICATION ##
+
+
 def est_dans_grille(ligne: str, colonne: int, grille: list[list]):
     # Si la ligne donnée par l'utilisateur n'est pas dans le dictionnaire (= lettres autorisées)
     if ligne not in LETTRE_VALEUR.keys():
@@ -89,6 +96,66 @@ def est_au_bon_format(message: str) -> bool:
     return True
 
 
+def est_meme_couleur(couleur_case_base: str, couleur_case_finale: str):
+    if couleur_case_base == couleur_case_finale:
+        return True
+    else:
+        return False
+
+
+def est_diagonale(
+    ligne_base: int, colonne_base: int, ligne_finale: int, colonne_finale: int
+) -> bool:
+
+    # On calcule la distance absolue parcourue
+    diff_lignes = abs(ligne_finale - ligne_base)
+    diff_colonnes = abs(colonne_finale - colonne_base)
+
+    # C'est une diagonale d'une seule case si la différence est de 1 sur les deux axes
+    if diff_lignes == 1 and diff_colonnes == 1:
+        return True
+    return False
+
+
+def peut_capturer(ligne: int, colonne: int, couleur: str, grille: list[list]) -> bool:
+    return len(lister_captures_pion(ligne, colonne, couleur, grille)) > 0
+
+
+def est_mouvement_vers_avant(
+    couleur_pion: str, ligne_base: int, ligne_finale: int
+) -> bool:
+    if couleur_pion == "b":
+        return ligne_finale < ligne_base  # Les blancs montent (index diminue)
+    elif couleur_pion == "n":
+        return ligne_finale > ligne_base  # Les noirs descendent (index augmente)
+    return False
+
+
+## FONCTIONS DE SAISIE ##
+
+
+def demander_grille() -> list[list]:
+    grille_input = int(
+        input(
+            "Veuillez choisir la grille en fonction de l'avancée du jeu : \n1 - type début de partie\n2 - type milieu de partie\n3 - fin de partie\n"
+        )
+    )
+
+    while grille_input not in [1, 2, 3]:
+        grille_input = int(
+            input(
+                "Veuillez choisir la grille en fonction de l'avancée du jeu : \n1 - type début de partie\n2 - type milieu de partie\n3 - fin de partie\n"
+            )
+        )
+
+    if grille_input == 1:
+        return creer_grille_debut_partie()
+    elif grille_input == 2:
+        return creer_grille_milieu_partie()
+    else:
+        return creer_grille_fin_partie()
+
+
 def saisie_coordonnees(grille: list[list]) -> tuple:
     while True:  # Boucle tant que l'utilisateur n'a pas rentré une information valide qui menerait à un return -> sortie de fonction
         reponse_utilisateur = str(input("Veuillez entrez des coordonnées : ")).upper()
@@ -110,63 +177,18 @@ def saisie_coordonnees(grille: list[list]) -> tuple:
             print("La position n'est pas dans la grille.")
 
 
-def lister_captures_pion(
-    ligne: int, colonne: int, couleur: str, grille: list[list]
-) -> list[tuple]:
-    captures_possibles = []
-    directions = [(-2, -2), (-2, 2), (2, -2), (2, 2)]
+def demander_saisie_pion_a_deplacer(
+    grille: list[list],
+) -> tuple[str, int, int]:
+    coordonnees = saisie_coordonnees(grille)
 
-    for diff_l, diff_c in directions:
-        ligne_arrivee = ligne + diff_l
-        colonne_arrivee = colonne + diff_c
+    if coordonnees == (-1, -1):
+        return "FF", -1, -1
 
-        if 0 <= ligne_arrivee < 8 and 0 <= colonne_arrivee < 8:
-            ligne_milieu = ligne + (diff_l // 2)
-            colonne_milieu = colonne + (diff_c // 2)
+    ligne, colonne = coordonnees
+    pion_joueur_actif = grille[ligne][colonne]
 
-            case_arrivee = grille[ligne_arrivee][colonne_arrivee]
-            pion_milieu = grille[ligne_milieu][colonne_milieu]
-
-            if case_arrivee == " " and pion_milieu != " " and pion_milieu != couleur:
-                captures_possibles.append((ligne_arrivee, colonne_arrivee))
-
-    return captures_possibles
-
-
-def peut_capturer(ligne: int, colonne: int, couleur: str, grille: list[list]) -> bool:
-    return len(lister_captures_pion(ligne, colonne, couleur, grille)) > 0
-
-
-def analyser_distance_diagonale(
-    ligne_base: int, colonne_base: int, ligne_finale: int, colonne_finale: int
-) -> int:
-    # Renvoie 1 pour un déplacement simple, 2 pour une capture, 0 si le mouvement est illégal
-    diff_lignes = abs(ligne_finale - ligne_base)
-    diff_colonnes = abs(colonne_finale - colonne_base)
-
-    if diff_lignes == diff_colonnes and diff_lignes in [1, 2]:
-        return diff_lignes
-    return 0
-
-
-def est_mouvement_vers_avant(
-    couleur_pion: str, ligne_base: int, ligne_finale: int
-) -> bool:
-    if couleur_pion == "b":
-        return ligne_finale < ligne_base  # Les blancs montent (index diminue)
-    elif couleur_pion == "n":
-        return ligne_finale > ligne_base  # Les noirs descendent (index augmente)
-    return False
-
-
-def obtenir_coordonnees_milieu(
-    ligne_base: int, colonne_base: int, ligne_finale: int, colonne_finale: int
-) -> tuple[int, int]:
-
-    # Fait la moyenne pour trouver la case survolée lors d'un saut
-    ligne_milieu = (ligne_base + ligne_finale) // 2
-    colonne_milieu = (colonne_base + colonne_finale) // 2
-    return ligne_milieu, colonne_milieu
+    return pion_joueur_actif, ligne, colonne
 
 
 def selectionner_pion_depart(
@@ -200,39 +222,151 @@ def selectionner_pion_depart(
             print("Ce pion adverse ne vous appartient pas.")
 
 
-def est_meme_couleur(couleur_case_base: str, couleur_case_finale: str):
-    if couleur_case_base == couleur_case_finale:
-        return True
-    else:
-        return False
+def demander_mode_de_jeu() -> str:
+    mode_de_jeu = int(
+        input(
+            "Veuillez sélectionner votre mode de jeu : \n1 - joueur contre joueur\n2 - joueur contre ordinateur\n"
+        )
+    )
+
+    while mode_de_jeu not in [1, 2]:
+        mode_de_jeu = int(
+            input(
+                "Veuillez sélectionner votre mode de jeu : \n1 - joueur contre joueur\n2 - joueur contre ordinateur\n"
+            )
+        )
+
+    return "jcj" if mode_de_jeu == 1 else "jco"
 
 
-def est_diagonale(
+## FONCTIONS UTILITAIRES ##
+
+
+def lister_captures_pion(
+    ligne: int, colonne: int, couleur: str, grille: list[list]
+) -> list[tuple]:
+    captures_possibles = []
+    directions = [(-2, -2), (-2, 2), (2, -2), (2, 2)]
+
+    for diff_l, diff_c in directions:
+        ligne_arrivee = ligne + diff_l
+        colonne_arrivee = colonne + diff_c
+
+        if 0 <= ligne_arrivee < 8 and 0 <= colonne_arrivee < 8:
+            ligne_milieu = ligne + (diff_l // 2)
+            colonne_milieu = colonne + (diff_c // 2)
+
+            case_arrivee = grille[ligne_arrivee][colonne_arrivee]
+            pion_milieu = grille[ligne_milieu][colonne_milieu]
+
+            if case_arrivee == " " and pion_milieu != " " and pion_milieu != couleur:
+                captures_possibles.append((ligne_arrivee, colonne_arrivee))
+
+    return captures_possibles
+
+
+def analyser_distance_diagonale(
     ligne_base: int, colonne_base: int, ligne_finale: int, colonne_finale: int
-) -> bool:
-
-    # On calcule la distance absolue parcourue
+) -> int:
+    # Renvoie 1 pour un déplacement simple, 2 pour une capture, 0 si le mouvement est illégal
     diff_lignes = abs(ligne_finale - ligne_base)
     diff_colonnes = abs(colonne_finale - colonne_base)
 
-    # C'est une diagonale d'une seule case si la différence est de 1 sur les deux axes
-    if diff_lignes == 1 and diff_colonnes == 1:
-        return True
-    return False
+    if diff_lignes == diff_colonnes and diff_lignes in [1, 2]:
+        return diff_lignes
+    return 0
 
 
-def demander_saisie_pion_a_deplacer(
+def obtenir_coordonnees_milieu(
+    ligne_base: int, colonne_base: int, ligne_finale: int, colonne_finale: int
+) -> tuple[int, int]:
+
+    # Fait la moyenne pour trouver la case survolée lors d'un saut
+    ligne_milieu = (ligne_base + ligne_finale) // 2
+    colonne_milieu = (colonne_base + colonne_finale) // 2
+    return ligne_milieu, colonne_milieu
+
+
+def coups_possible_pour_pion_donne(
+    grille: list[list[str]], ligne_pion: int, colonne_pion: int, tour_de_jeu: str
+) -> list:
+    LETTRE_COULEUR = tour_de_jeu[0]
+    coups_simples = []
+    coups_captures = lister_captures_pion(
+        ligne_pion, colonne_pion, LETTRE_COULEUR, grille
+    )
+
+    directions_simples = directions_simple_par_couleur(tour_de_jeu)
+
+    for diff_i, diff_j in directions_simples:
+        ligne_finale = ligne_pion + diff_i
+        colonne_finale = colonne_pion + diff_j
+
+        if 0 <= ligne_finale < 8 and 0 <= colonne_finale < 8:
+            if grille[ligne_finale][colonne_finale] == " ":
+                coups_simples.append((ligne_finale, colonne_finale))
+
+    return coups_captures if len(coups_captures) > 0 else coups_simples
+
+
+def coups_possibles(grille: list[list[str]], tour_de_jeu: str) -> list[tuple]:
+    LETTRE_COULEUR = tour_de_jeu[0]
+    coups_simples = []
+    coups_captures = []
+
+    for i in range(8):
+        for j in range(8):
+            if grille[i][j] == LETTRE_COULEUR:
+                destinations_capture = lister_captures_pion(
+                    i, j, LETTRE_COULEUR, grille
+                )
+                for destination in destinations_capture:
+                    coups_captures.append(((i, j), destination))
+
+                directions_simples = directions_simple_par_couleur(tour_de_jeu)
+
+                for diff_i, diff_j in directions_simples:
+                    ligne_finale = i + diff_i
+                    colonne_finale = j + diff_j
+
+                    if 0 <= ligne_finale < 8 and 0 <= colonne_finale < 8:
+                        if grille[ligne_finale][colonne_finale] == " ":
+                            coups_simples.append(
+                                ((i, j), (ligne_finale, colonne_finale))
+                            )
+
+    # Priorité à la capture car si on peut manger on doit le faire.
+    if len(coups_captures) > 0:
+        return coups_captures
+    else:
+        return coups_simples
+
+
+def directions_simple_par_couleur(tour_de_jeu: str) -> list[tuple]:
+    LETTRE_COULEUR = tour_de_jeu[0]
+
+    directions_simples = []
+    if LETTRE_COULEUR == "b":
+        directions_simples = [(-1, -1), (-1, 1)]
+    elif LETTRE_COULEUR == "n":
+        directions_simples = [(1, -1), (1, 1)]
+
+    return directions_simples
+
+
+def remplacer_case_capturee(
     grille: list[list],
-) -> tuple[str, int, int]:
-    coordonnees = saisie_coordonnees(grille)
+    LETTRE_COULEUR: str,
+    ligne_base: int,
+    colonne_base: int,
+    ligne_finale: int,
+    colonne_finale: int,
+):
+    grille[ligne_finale][colonne_finale] = LETTRE_COULEUR
+    grille[ligne_base][colonne_base] = " "
 
-    if coordonnees == (-1, -1):
-        return "FF", -1, -1
 
-    ligne, colonne = coordonnees
-    pion_joueur_actif = grille[ligne][colonne]
-
-    return pion_joueur_actif, ligne, colonne
+#### FONCTIONS PRINCIPALES ####
 
 
 def deplacer_pion(
@@ -344,30 +478,6 @@ def deplacer_pion(
                 return nb_pion_mange
 
 
-def directions_simple_par_couleur(tour_de_jeu: str) -> list[tuple]:
-    LETTRE_COULEUR = tour_de_jeu[0]
-
-    directions_simples = []
-    if LETTRE_COULEUR == "b":
-        directions_simples = [(-1, -1), (-1, 1)]
-    elif LETTRE_COULEUR == "n":
-        directions_simples = [(1, -1), (1, 1)]
-
-    return directions_simples
-
-
-def remplacer_case_capturee(
-    grille: list[list],
-    LETTRE_COULEUR: str,
-    ligne_base: int,
-    colonne_base: int,
-    ligne_finale: int,
-    colonne_finale: int,
-):
-    grille[ligne_finale][colonne_finale] = LETTRE_COULEUR
-    grille[ligne_base][colonne_base] = " "
-
-
 def deplacer_pion_ia_naive(grille: list[list], tour_de_jeu: str) -> int:
     LETTRE_COULEUR = tour_de_jeu[0]
     nb_pion_mange = 0
@@ -439,100 +549,6 @@ def deplacer_pion_ia_naive(grille: list[list], tour_de_jeu: str) -> int:
             colonne_finale = nouvelle_colonne_finale
 
     return nb_pion_mange
-
-
-def coups_possible_pour_pion_donne(
-    grille: list[list[str]], ligne_pion: int, colonne_pion: int, tour_de_jeu: str
-) -> list:
-    LETTRE_COULEUR = tour_de_jeu[0]
-    coups_simples = []
-    coups_captures = lister_captures_pion(
-        ligne_pion, colonne_pion, LETTRE_COULEUR, grille
-    )
-
-    directions_simples = directions_simple_par_couleur(tour_de_jeu)
-
-    for diff_i, diff_j in directions_simples:
-        ligne_finale = ligne_pion + diff_i
-        colonne_finale = colonne_pion + diff_j
-
-        if 0 <= ligne_finale < 8 and 0 <= colonne_finale < 8:
-            if grille[ligne_finale][colonne_finale] == " ":
-                coups_simples.append((ligne_finale, colonne_finale))
-
-    return coups_captures if len(coups_captures) > 0 else coups_simples
-
-
-def coups_possibles(grille: list[list[str]], tour_de_jeu: str) -> list[tuple]:
-    LETTRE_COULEUR = tour_de_jeu[0]
-    coups_simples = []
-    coups_captures = []
-
-    for i in range(8):
-        for j in range(8):
-            if grille[i][j] == LETTRE_COULEUR:
-                destinations_capture = lister_captures_pion(
-                    i, j, LETTRE_COULEUR, grille
-                )
-                for destination in destinations_capture:
-                    coups_captures.append(((i, j), destination))
-
-                directions_simples = directions_simple_par_couleur(tour_de_jeu)
-
-                for diff_i, diff_j in directions_simples:
-                    ligne_finale = i + diff_i
-                    colonne_finale = j + diff_j
-
-                    if 0 <= ligne_finale < 8 and 0 <= colonne_finale < 8:
-                        if grille[ligne_finale][colonne_finale] == " ":
-                            coups_simples.append(
-                                ((i, j), (ligne_finale, colonne_finale))
-                            )
-
-    # Priorité à la capture car si on peut manger on doit le faire.
-    if len(coups_captures) > 0:
-        return coups_captures
-    else:
-        return coups_simples
-
-
-def demander_mode_de_jeu() -> str:
-    mode_de_jeu = int(
-        input(
-            "Veuillez sélectionner votre mode de jeu : \n1 - joueur contre joueur\n2 - joueur contre ordinateur\n"
-        )
-    )
-
-    while mode_de_jeu not in [1, 2]:
-        mode_de_jeu = int(
-            input(
-                "Veuillez sélectionner votre mode de jeu : \n1 - joueur contre joueur\n2 - joueur contre ordinateur\n"
-            )
-        )
-
-    return "jcj" if mode_de_jeu == 1 else "jco"
-
-
-def demander_grille() -> list[list]:
-    grille_input = int(
-        input(
-            "Veuillez choisir la grille en fonction de l'avancée du jeu : \n1 - type début de partie\n2 - type milieu de partie\n3 - fin de partie\n"
-        )
-    )
-
-    while grille_input not in [1, 2, 3]:
-        grille_input = int(
-            input(
-                "Veuillez choisir la grille en fonction de l'avancée du jeu : \n1 - type début de partie\n2 - type milieu de partie\n3 - fin de partie\n"
-            )
-        )
-
-    if grille_input == 1:
-        return creer_grille_debut_partie()
-    elif grille_input == 2:
-        return creer_grille_milieu_partie()
-    else:
-        return creer_grille_fin_partie()
 
 
 def afficher_grille(
