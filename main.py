@@ -93,6 +93,9 @@ def saisie_coordonnees(grille: list[list]) -> tuple:
     while True:  # Boucle tant que l'utilisateur n'a pas rentré une information valide qui menerait à un return -> sortie de fonction
         reponse_utilisateur = str(input("Veuillez entrez des coordonnées : ")).upper()
 
+        if reponse_utilisateur == "FF":
+            return (-1, -1)
+
         if not est_au_bon_format(reponse_utilisateur):
             print("Format invalide : [A-H][1-8]")
             continue  # Recommence la boucle au début (passe tout le code suivant)
@@ -173,11 +176,14 @@ def selectionner_pion_depart(
     # Gère la boucle de sélection du pion (s'assure que le joueur choisit SA couleur)
 
     while True:
-        print("\nQuel pion souhaitez-vous déplacer ?")
+        print("Quel pion souhaitez-vous déplacer ? (FF pour abandonner)")
 
         pion_joueur_actif, ligne_base, colonne_base = demander_saisie_pion_a_deplacer(
             grille
         )
+
+        if pion_joueur_actif == "FF":
+            return "FF", -1, -1
 
         possibilités = coups_possible_pour_pion_donne(
             grille, ligne_base, colonne_base, lettre_couleur
@@ -220,8 +226,11 @@ def est_diagonale(
 def demander_saisie_pion_a_deplacer(
     grille: list[list],
 ) -> tuple[str, int, int]:
-
     coordonnees = saisie_coordonnees(grille)
+
+    if coordonnees == (-1, -1):
+        return "FF", -1, -1
+
     ligne, colonne = coordonnees
     pion_joueur_actif = grille[ligne][colonne]
 
@@ -254,6 +263,9 @@ def deplacer_pion(
                 grille, tour_de_jeu, nb_pions_captures_noirs, nb_pions_captures_blancs
             )
         else:
+            if pion_joueur_actif == "FF":
+                return -1
+
             print("Où souhaitez-vous le déplacer ?")
 
         case_position_finale, ligne_finale, colonne_finale = (
@@ -551,6 +563,12 @@ def jeu(tour_de_jeu: str):
         else:
             # Faire la liste des coups possibles et appliquer le déplacement.
             nb_pions_manges = deplacer_pion_ia_naive(grille, tour_de_jeu)
+
+        if nb_pions_manges == -1:
+            print(
+                f"\nLes {tour_de_jeu} ont décidés d'abandonner, ce qui met fin à la partie sur la défaite de {tour_de_jeu} !"
+            )
+            break
 
         if tour_de_jeu == "blancs":
             nb_pions_captures_par_blancs += nb_pions_manges
