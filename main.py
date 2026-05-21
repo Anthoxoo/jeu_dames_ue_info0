@@ -172,7 +172,6 @@ def obtenir_coordonnees_milieu(
 def selectionner_pion_depart(
     grille: list[list], lettre_couleur: str
 ) -> tuple[str, int, int]:
-
     # Gère la boucle de sélection du pion (s'assure que le joueur choisit SA couleur)
 
     while True:
@@ -202,7 +201,6 @@ def selectionner_pion_depart(
 
 
 def est_meme_couleur(couleur_case_base: str, couleur_case_finale: str):
-
     if couleur_case_base == couleur_case_finale:
         return True
     else:
@@ -299,8 +297,15 @@ def deplacer_pion(
                 )
                 continue
 
-            grille[ligne_finale][colonne_finale] = pion_joueur_actif
-            grille[ligne_base][colonne_base] = " "
+            remplacer_case_capturee(
+                grille,
+                LETTRE_COULEUR,
+                ligne_base,
+                colonne_base,
+                ligne_finale,
+                colonne_finale,
+            )
+
             return nb_pion_mange
 
         # cas 2 : Capture
@@ -315,8 +320,14 @@ def deplacer_pion(
                 print("Saut invalide : vous devez sauter par-dessus un pion adverse !")
                 continue
 
-            grille[ligne_finale][colonne_finale] = pion_joueur_actif
-            grille[ligne_base][colonne_base] = " "
+            remplacer_case_capturee(
+                grille,
+                LETTRE_COULEUR,
+                ligne_base,
+                colonne_base,
+                ligne_finale,
+                colonne_finale,
+            )
             grille[ligne_milieu][colonne_milieu] = " "
 
             nb_pion_mange += 1
@@ -345,6 +356,18 @@ def directions_simple_par_couleur(tour_de_jeu: str) -> list[tuple]:
     return directions_simples
 
 
+def remplacer_case_capturee(
+    grille: list[list],
+    LETTRE_COULEUR: str,
+    ligne_base: int,
+    colonne_base: int,
+    ligne_finale: int,
+    colonne_finale: int,
+):
+    grille[ligne_finale][colonne_finale] = LETTRE_COULEUR
+    grille[ligne_base][colonne_base] = " "
+
+
 def deplacer_pion_ia_naive(grille: list[list], tour_de_jeu: str) -> int:
     LETTRE_COULEUR = tour_de_jeu[0]
     nb_pion_mange = 0
@@ -362,8 +385,9 @@ def deplacer_pion_ia_naive(grille: list[list], tour_de_jeu: str) -> int:
         ligne_base, colonne_base, ligne_finale, colonne_finale
     )
 
-    grille[ligne_finale][colonne_finale] = LETTRE_COULEUR
-    grille[ligne_base][colonne_base] = " "
+    remplacer_case_capturee(
+        grille, LETTRE_COULEUR, ligne_base, colonne_base, ligne_finale, colonne_finale
+    )
 
     # Déplacement simple
     if distance == 1:
@@ -401,8 +425,14 @@ def deplacer_pion_ia_naive(grille: list[list], tour_de_jeu: str) -> int:
             )
             grille[ligne_milieu][colonne_milieu] = " "
 
-            grille[nouvelle_ligne_finale][nouvelle_colonne_finale] = LETTRE_COULEUR
-            grille[ligne_finale][colonne_finale] = " "
+            remplacer_case_capturee(
+                grille,
+                LETTRE_COULEUR,
+                ligne_finale,
+                colonne_finale,
+                nouvelle_ligne_finale,
+                nouvelle_colonne_finale,
+            )
 
             nb_pion_mange += 1
             ligne_finale = nouvelle_ligne_finale
