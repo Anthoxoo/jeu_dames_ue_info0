@@ -560,6 +560,12 @@ def jeu(tour_de_jeu: str):
             nb_pions_captures_par_noirs += nb_pions_manges
             tour_de_jeu = "blancs"
 
+        if len(coups_possibles(grille, tour_de_jeu)) == 0:
+            print(
+                f"les {tour_de_jeu} n'ont plus de coups valable, la partie se termine donc avec la défaite des {tour_de_jeu} !"
+            )
+            break
+
         if nb_pions_captures_par_blancs >= 12:
             print(
                 "Les blancs ont remportés la victoire, ils ont capturés tous les pions adverses."

@@ -1,7 +1,6 @@
 Faire le description en s'aidant de tous les commits git pour dire ce qu'on a fait pour x atelier.
 Faire une option de rédition.
 Faire des tests pour les fonctions qui n'en n'ont pas.
-Si tous les pions d'une équipe sont bloqués, partie finie et victoire pour l'équipe adverse.
 
 Faire une fontion pour :
 grille[ligne_finale][colonne_finale] = pion_joueur_actif
