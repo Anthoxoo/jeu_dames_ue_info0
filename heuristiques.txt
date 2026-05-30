@@ -1,0 +1,12 @@
+Fonctionnement de l'ia :
+- On regarde si il y a des captures possibles, si oui alors on les mets dans une liste
+
+- Sinon on prend tous les coups simples et on les mets dans une liste
+
+- On prend une valeur aléatoire parmi les couples de la liste
+
+- On applique le coup : capture si il y en avait au moins une possible sinon déplacement
+
+- On re regarde les coups possibles, si il y a une capture de possible alors on considère que l'ordinateur est en enchainement
+
+- On applique le coup jusqu'à ce que l'enchainement se termine.
