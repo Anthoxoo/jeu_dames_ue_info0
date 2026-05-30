@@ -762,12 +762,9 @@ def test():  # Fonction de test principale, appelle chacune des petites fonction
         grille[4][4] = "b"
         assert len(coups_possible_pour_pion_donne(grille, 4, 4, "blancs")) == 2
 
-    # def test_coups_possibles():
-    #     grille = creer_grille_fin_partie()
-    #     grille[4][4] = "b"
-    #     afficher_grille(grille, "blancs", 0, 0)
-    #     print()
-    #     assert len(coups_possibles(grille, "blancs")) == 2
+    def test_coups_possibles():
+        grille = creer_grille_fin_partie()
+        assert len(coups_possibles(grille, "blancs")) == 6
 
     # Appel des sous-fonctions de test
     test_est_au_bon_format()
@@ -782,7 +779,7 @@ def test():  # Fonction de test principale, appelle chacune des petites fonction
     test_directions_simple_par_couleur()
     test_remplacer_case_capturee()
     test_coups_possible_pour_pion_donne()
-    # test_coups_possibles()
+    test_coups_possibles()
 
     print(" TESTS OK")
 
