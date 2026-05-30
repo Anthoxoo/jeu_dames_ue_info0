@@ -1,0 +1,13 @@
+Avancement du projet : Atelier 4 - bonus
+
+Fonctionnalités non implémentées :
+- Promotion -> Lorsque les pions des deux cotés sont passés de l'autre coté l'un de l'autre, le jeu se bloque en quelques sorte car il n'y a aucun moyen d'aller chercher les pions adverses
+- IA : Pas d'optimisation pour classer les "meilleurs"
+- Fonctions principales trop longues (Le formateur automatique de mon IDE fait que lorsque l'appel d'une fonction est long il va le mettre sur plusieurs lignes alors que c'est en réalité une seule ligne.)
+
+Implémentations :
+- IA avec un tout petit peu d'heuristique
+- Abandon
+- Affichage avec toutes les informations
+- Enchainement
+- Tests pour toutes les fonctions intermédiaires
